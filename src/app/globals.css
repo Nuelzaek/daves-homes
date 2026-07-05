@@ -45,10 +45,6 @@ body{
   position:fixed;inset:0;pointer-events:none;z-index:50;opacity:0.035;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-.marquee-track{ display:flex;white-space:nowrap; animation: marquee 28s linear infinite; }
-@keyframes marquee{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
-.no-scrollbar::-webkit-scrollbar{display:none;}
-.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
 ::selection{background:var(--sand);color:var(--ink);}
 .glass-nav{ backdrop-filter: blur(24px); background:rgba(253,246,236,0.72); }
 a:focus-visible, button:focus-visible{ outline:2px solid var(--teal); outline-offset:3px; }

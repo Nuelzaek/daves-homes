@@ -8,8 +8,6 @@ function formatPrice(n: number) {
   return `₦${(n / 1_000_000).toFixed(1)}M / year`
 }
 
-const NEIGHBOURHOODS = ['GRA', 'Trans-Amadi', 'Woji', 'Eliozu', 'Rumuola', 'D-Line', 'Ada George', 'Elelenwo']
-
 export default function HomeClient({ listings }: { listings: Listing[] }) {
   const [active, setActive] = useState<Listing | null>(null)
   const [activeImg, setActiveImg] = useState(0)
@@ -64,17 +62,21 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
         gsap.to('#hero-text', { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.1, delay: 0.1, ease: 'power3.out' })
         gsap.to('#hero-search', { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.1, delay: 0.35, ease: 'power3.out' })
 
-        // Slow, continuous drift on the hero background photos — the site felt
-        // static without it. Respects prefers-reduced-motion for accessibility.
+        // Slow, continuous drift on the hero background photos. Full motion
+        // for most visitors; a much gentler opacity-only breathe for anyone
+        // with prefers-reduced-motion, instead of no motion at all — this is
+        // decorative-only, low-amplitude, and never conveys information.
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        if (!reduceMotion) {
-          const driftConfig = [
-            { y: -22, x: 10, scale: 1.06, duration: 9 },
-            { y: 18, x: -14, scale: 1.05, duration: 11 },
-            { y: -16, x: -8, scale: 1.07, duration: 8 },
-          ]
-          document.querySelectorAll('.hero-drift').forEach((el, i) => {
-            const cfg = driftConfig[i % driftConfig.length]
+        const driftConfig = [
+          { y: -26, x: 14, scale: 1.09, duration: 9 },
+          { y: 22, x: -18, scale: 1.08, duration: 11 },
+          { y: -20, x: -10, scale: 1.1, duration: 8 },
+        ]
+        document.querySelectorAll('.hero-drift').forEach((el, i) => {
+          const cfg = driftConfig[i % driftConfig.length]
+          if (reduceMotion) {
+            gsap.to(el, { opacity: 0.75, duration: 4, delay: i * 0.6, ease: 'sine.inOut', yoyo: true, repeat: -1 })
+          } else {
             gsap.to(el, {
               y: cfg.y, x: cfg.x, scale: cfg.scale,
               duration: cfg.duration,
@@ -83,8 +85,8 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
               yoyo: true,
               repeat: -1,
             })
-          })
-        }
+          }
+        })
 
         const track = document.querySelector('.horiz-track') as HTMLElement | null
         const wrap = document.querySelector('.pin-wrap') as HTMLElement | null
@@ -177,14 +179,6 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
           </div>
         </div>
       </section>
-
-      <div className="py-4 overflow-hidden" style={{ background: 'var(--sand)' }}>
-        <div className="marquee-track font-display font-bold text-xl md:text-2xl" style={{ color: 'var(--ink)' }}>
-          {[...NEIGHBOURHOODS, ...NEIGHBOURHOODS].map((n, i) => (
-            <span key={i} className="px-6 flex items-center gap-6">{n}<span className="opacity-50">&bull;</span></span>
-          ))}
-        </div>
-      </div>
 
       <section id="explore" className="py-24 md:py-36 px-4 md:px-8">
         <div className="max-w-6xl mx-auto">
@@ -291,25 +285,23 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
         </div>
       </section>
 
-      <section id="reviews" className="py-24 md:py-32" style={{ background: 'var(--ink-2)' }}>
-        <div className="max-w-6xl mx-auto px-4 md:px-8 mb-10">
+      <section id="reviews" className="py-24 md:py-32 px-4 md:px-8" style={{ background: 'var(--ink-2)' }}>
+        <div className="max-w-6xl mx-auto mb-10">
           <h2 className="font-display font-extrabold reveal" style={{ color: 'var(--cream)', fontSize: 'clamp(1.8rem,3.6vw,2.8rem)' }}>Port Harcourt families who found their house</h2>
         </div>
-        <div className="overflow-hidden no-scrollbar">
-          <div className="marquee-track gap-5" style={{ animationDuration: '34s' }}>
-            {[
-              ['“Relocated to Woji and had a duplex confirmed in two days. No agent drama at all.”', '— Amaka O.'],
-              ['“The photos matched the actual house in GRA. First time that’s ever happened to me.”', '— Tunde A.'],
-              ['“Listed my duplex in Trans-Amadi on a Monday, had three verified applicants by Wednesday.”', '— Chidera N.'],
-            ].flatMap((pair) => [pair, pair]).map(([quote, author], i) => (
-              <div key={i} className="shrink-0 w-[300px] md:w-[340px] mx-2 bezel-dark">
-                <div className="bezel-inner p-6" style={{ background: 'var(--ink)' }}>
-                  <p className="font-medium mb-4" style={{ color: 'rgba(253,246,236,0.85)' }}>{quote}</p>
-                  <p className="font-bold text-sm" style={{ color: 'var(--sand)' }}>{author}</p>
-                </div>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[
+            ['“Relocated to Woji and had a duplex confirmed in two days. No agent drama at all.”', '— Amaka O.'],
+            ['“The photos matched the actual house in GRA. First time that’s ever happened to me.”', '— Tunde A.'],
+            ['“Listed my duplex in Trans-Amadi on a Monday, had three verified applicants by Wednesday.”', '— Chidera N.'],
+          ].map(([quote, author], i) => (
+            <div key={i} className="reveal bezel-dark">
+              <div className="bezel-inner p-6" style={{ background: 'var(--ink)' }}>
+                <p className="font-medium mb-4" style={{ color: 'rgba(253,246,236,0.85)' }}>{quote}</p>
+                <p className="font-bold text-sm" style={{ color: 'var(--sand)' }}>{author}</p>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </section>
 
