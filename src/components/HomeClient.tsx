@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Listing } from '@/lib/listings'
 
 function formatPrice(n: number) {
@@ -63,6 +64,28 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
         gsap.to('#hero-text', { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.1, delay: 0.1, ease: 'power3.out' })
         gsap.to('#hero-search', { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.1, delay: 0.35, ease: 'power3.out' })
 
+        // Slow, continuous drift on the hero background photos — the site felt
+        // static without it. Respects prefers-reduced-motion for accessibility.
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        if (!reduceMotion) {
+          const driftConfig = [
+            { y: -22, x: 10, scale: 1.06, duration: 9 },
+            { y: 18, x: -14, scale: 1.05, duration: 11 },
+            { y: -16, x: -8, scale: 1.07, duration: 8 },
+          ]
+          document.querySelectorAll('.hero-drift').forEach((el, i) => {
+            const cfg = driftConfig[i % driftConfig.length]
+            gsap.to(el, {
+              y: cfg.y, x: cfg.x, scale: cfg.scale,
+              duration: cfg.duration,
+              delay: i * 0.6,
+              ease: 'sine.inOut',
+              yoyo: true,
+              repeat: -1,
+            })
+          })
+        }
+
         const track = document.querySelector('.horiz-track') as HTMLElement | null
         const wrap = document.querySelector('.pin-wrap') as HTMLElement | null
         if (track && wrap) {
@@ -108,14 +131,14 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
 
       <section id="top" className="relative min-h-[100dvh] flex flex-col justify-center pt-32 pb-16 px-4 md:px-8 overflow-hidden" style={{ background: 'var(--ink)' }}>
         <div className="absolute inset-0 z-0 opacity-40">
-          <div className="absolute -left-10 top-10 w-64 h-80 md:w-80 md:h-96 rounded-[2rem] overflow-hidden rotate-[-6deg]">
-            <img src="https://images.pexels.com/photos/1974596/pexels-photo-1974596.jpeg?auto=compress&cs=tinysrgb&w=900" className="w-full h-full object-cover" alt="" />
+          <div className="hero-drift absolute -left-10 top-10 w-64 h-80 md:w-80 md:h-96 rounded-[2rem] overflow-hidden rotate-[-6deg]">
+            <Image src="https://images.pexels.com/photos/1974596/pexels-photo-1974596.jpeg?auto=compress&cs=tinysrgb&w=900" fill sizes="320px" priority className="object-cover" alt="" />
           </div>
-          <div className="absolute right-0 top-0 w-56 h-72 md:w-72 md:h-96 rounded-[2rem] overflow-hidden rotate-[5deg]">
-            <img src="https://images.pexels.com/photos/7031406/pexels-photo-7031406.jpeg?auto=compress&cs=tinysrgb&w=900" className="w-full h-full object-cover" alt="" />
+          <div className="hero-drift absolute right-0 top-0 w-56 h-72 md:w-72 md:h-96 rounded-[2rem] overflow-hidden rotate-[5deg]">
+            <Image src="https://images.pexels.com/photos/7031406/pexels-photo-7031406.jpeg?auto=compress&cs=tinysrgb&w=900" fill sizes="288px" priority className="object-cover" alt="" />
           </div>
-          <div className="absolute left-1/3 bottom-0 w-60 h-64 rounded-[2rem] overflow-hidden rotate-[3deg] hidden md:block">
-            <img src="https://images.pexels.com/photos/7031604/pexels-photo-7031604.jpeg?auto=compress&cs=tinysrgb&w=900" className="w-full h-full object-cover" alt="" />
+          <div className="hero-drift absolute left-1/3 bottom-0 w-60 h-64 rounded-[2rem] overflow-hidden rotate-[3deg] hidden md:block">
+            <Image src="https://images.pexels.com/photos/7031604/pexels-photo-7031604.jpeg?auto=compress&cs=tinysrgb&w=900" fill sizes="240px" className="object-cover" alt="" />
           </div>
         </div>
         <div className="absolute inset-0 z-0" style={{ background: 'radial-gradient(ellipse at center, rgba(36,26,21,0.55) 0%, rgba(36,26,21,0.92) 70%)' }} />
@@ -171,7 +194,7 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 grid-flow-dense gap-4 md:gap-5">
             <Link href="/listings" className="reveal group relative col-span-2 row-span-2 rounded-[2rem] overflow-hidden min-h-[280px] md:min-h-[420px]">
-              <img src="https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Duplexes" />
+              <Image src="https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-105" alt="Duplexes" />
               <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(36,26,21,0.85), transparent 60%)' }} />
               <div className="absolute bottom-0 p-6">
                 <span className="inline-block rounded-full px-3 py-1 text-[10px] uppercase tracking-widest font-bold mb-2" style={{ background: 'var(--terracotta)', color: 'var(--cream)' }}>Most popular</span>
@@ -185,7 +208,7 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
               ['https://images.pexels.com/photos/30580640/pexels-photo-30580640.jpeg?auto=compress&cs=tinysrgb&w=800', 'Semi-detached', 'Semi-Detached'],
             ].map(([img, alt, label]) => (
               <Link key={label} href="/listings" className="reveal group relative rounded-[2rem] overflow-hidden min-h-[130px] md:min-h-[200px]">
-                <img src={img} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt={alt} />
+                <Image src={img} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover transition-transform duration-700 group-hover:scale-105" alt={alt} />
                 <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(36,26,21,0.8), transparent 55%)' }} />
                 <h3 className="absolute bottom-4 left-4 font-display font-bold text-lg md:text-xl" style={{ color: 'var(--cream)' }}>{label}</h3>
               </Link>
@@ -212,7 +235,7 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
                 className="listing-card btn group shrink-0 w-[78vw] md:w-[26vw] rounded-[2rem] overflow-hidden relative cursor-pointer"
                 style={{ height: '56vh' }}
               >
-                <img src={listing.images[0]} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt={listing.title} />
+                <Image src={listing.images[0]} fill sizes="(max-width: 768px) 78vw, 26vw" className="object-cover transition-transform duration-700 group-hover:scale-105" alt={listing.title} />
                 <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(36,26,21,0.85), transparent 55%)' }} />
                 <span className="absolute top-4 right-4 rounded-full px-3 py-1.5 text-xs font-bold flex items-center gap-1" style={{ background: 'rgba(253,246,236,0.92)', color: 'var(--ink)' }}>
                   View interior <span className="btn-icon">&rarr;</span>
@@ -339,7 +362,7 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
               <div className="grid grid-cols-4 gap-2 mb-6">
                 {active.images.map((src, i) => (
                   <button key={i} className={`thumb-btn${i === activeImg ? ' active' : ''}`} onClick={() => setActiveImg(i)} aria-label={`View photo ${i + 1}`}>
-                    <img src={src} style={{ width: '100%', height: 70, objectFit: 'cover', display: 'block' }} alt="" />
+                    <Image src={src} width={200} height={70} style={{ width: '100%', height: 70, objectFit: 'cover', display: 'block' }} alt="" />
                   </button>
                 ))}
               </div>

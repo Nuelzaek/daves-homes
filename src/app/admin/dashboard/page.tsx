@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Listing } from '@/lib/listings'
 
 export default function AdminDashboard() {
@@ -58,7 +59,7 @@ export default function AdminDashboard() {
           <div className="grid gap-4">
             {listings.map((listing) => (
               <div key={listing.id} className="flex items-center gap-4 rounded-2xl p-4 bg-white/60 border border-black/5">
-                <img src={listing.images?.[0]} alt="" className="w-20 h-20 rounded-xl object-cover shrink-0" />
+                <Image src={listing.images?.[0] ?? ''} alt="" width={80} height={80} className="w-20 h-20 rounded-xl object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="font-display font-bold">{listing.title}</p>
                   <p className="text-sm opacity-60">{listing.neighbourhood} &middot; {listing.type} &middot; {listing.available ? 'Available' : 'Not available'}</p>

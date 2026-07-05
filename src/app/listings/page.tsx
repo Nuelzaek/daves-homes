@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 import { getAllListings } from "@/lib/db/listings"
 
 export const metadata: Metadata = {
@@ -30,7 +31,7 @@ export default async function ListingsPage() {
               className="group rounded-[1.5rem] overflow-hidden relative block"
               style={{ height: 340 }}
             >
-              <img src={listing.images[0]} alt={listing.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <Image src={listing.images[0]} alt={listing.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
               <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(36,26,21,0.85), transparent 55%)" }} />
               <div className="absolute bottom-0 p-5" style={{ color: "var(--cream)" }}>
                 <p className="text-xs uppercase tracking-widest opacity-70 font-semibold mb-1">{listing.neighbourhood}, Port Harcourt</p>

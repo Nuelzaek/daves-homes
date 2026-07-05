@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 import { notFound } from "next/navigation"
 import { getAllListings, getListingBySlug } from "@/lib/db/listings"
 
@@ -49,7 +50,9 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 my-8 rounded-[1.5rem] overflow-hidden">
           {listing.images.map((src, i) => (
-            <img key={i} src={src} alt={`${listing.title} photo ${i + 1}`} className={i === 0 ? "col-span-2 row-span-2 w-full h-full object-cover" : "w-full h-full object-cover"} />
+            <div key={i} className={`relative ${i === 0 ? "col-span-2 row-span-2 aspect-square" : "aspect-square"}`}>
+              <Image src={src} alt={`${listing.title} photo ${i + 1}`} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" priority={i === 0} />
+            </div>
           ))}
         </div>
 

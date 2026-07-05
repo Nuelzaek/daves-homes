@@ -30,7 +30,7 @@ begin
   new.updated_at = now();
   return new;
 end;
-$$ language plpgsql;
+$$ language plpgsql set search_path = public;
 
 drop trigger if exists listings_set_updated_at on public.listings;
 create trigger listings_set_updated_at
@@ -65,7 +65,11 @@ begin
     return query select true, 0;
   end if;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
+
+-- Only the service-role key should ever call this — never anon/authenticated.
+revoke execute on function public.rate_limit_hit(text, int, int) from anon, authenticated, public;
+grant execute on function public.rate_limit_hit(text, int, int) to service_role;
 
 -- RLS: listings are served to the public via the service-role key from server
 -- components only (see src/lib/db/listings.ts), so no anon-key policies are
