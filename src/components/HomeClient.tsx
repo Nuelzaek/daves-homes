@@ -62,31 +62,10 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
         gsap.to('#hero-text', { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.1, delay: 0.1, ease: 'power3.out' })
         gsap.to('#hero-search', { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.1, delay: 0.35, ease: 'power3.out' })
 
-        // Slow, continuous drift on the hero background photos. Full motion
-        // for most visitors; a much gentler opacity-only breathe for anyone
-        // with prefers-reduced-motion, instead of no motion at all — this is
-        // decorative-only, low-amplitude, and never conveys information.
-        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        const driftConfig = [
-          { y: -26, x: 14, scale: 1.09, duration: 9 },
-          { y: 22, x: -18, scale: 1.08, duration: 11 },
-          { y: -20, x: -10, scale: 1.1, duration: 8 },
-        ]
-        document.querySelectorAll('.hero-drift').forEach((el, i) => {
-          const cfg = driftConfig[i % driftConfig.length]
-          if (reduceMotion) {
-            gsap.to(el, { opacity: 0.75, duration: 4, delay: i * 0.6, ease: 'sine.inOut', yoyo: true, repeat: -1 })
-          } else {
-            gsap.to(el, {
-              y: cfg.y, x: cfg.x, scale: cfg.scale,
-              duration: cfg.duration,
-              delay: i * 0.6,
-              ease: 'sine.inOut',
-              yoyo: true,
-              repeat: -1,
-            })
-          }
-        })
+        // Hero background drift is handled by a pure CSS animation
+        // (see .hero-drift in globals.css) — more reliable than a JS-driven
+        // tween for an always-on ambient effect, and it respects
+        // prefers-reduced-motion via a plain media query.
 
         const track = document.querySelector('.horiz-track') as HTMLElement | null
         const wrap = document.querySelector('.pin-wrap') as HTMLElement | null
