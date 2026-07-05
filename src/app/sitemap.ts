@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next"
+import { getSiteUrl } from "@/lib/siteUrl"
 import { getAllListings } from "@/lib/db/listings"
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.daveshomesph.com"
+const SITE_URL = getSiteUrl()
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const listings = await getAllListings()

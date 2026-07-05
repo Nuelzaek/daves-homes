@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
+import { getSiteUrl } from "@/lib/siteUrl"
 
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -13,7 +14,7 @@ const jakarta = Plus_Jakarta_Sans({
   weight: ["400", "500", "600", "700", "800"],
 })
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.daveshomesph.com"
+const SITE_URL = getSiteUrl()
 const SITE_NAME = "Dave's Homes"
 const SITE_DESCRIPTION = "Verified houses for rent in Port Harcourt — real photos, real landlords, zero agent drama."
 
