@@ -69,6 +69,8 @@ body{
 .glass-nav{ backdrop-filter: blur(24px); background:rgba(253,246,236,0.72); }
 a:focus-visible, button:focus-visible{ outline:2px solid var(--teal); outline-offset:3px; }
 .listing-card:focus-visible{ outline:3px solid var(--sand); outline-offset:4px; }
+.no-scrollbar::-webkit-scrollbar{display:none;}
+.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
 #listing-modal{
   position:fixed;inset:0;z-index:60;
   display:none;

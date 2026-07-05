@@ -11,6 +11,7 @@ function formatPrice(n: number) {
 export default function HomeClient({ listings }: { listings: Listing[] }) {
   const [active, setActive] = useState<Listing | null>(null)
   const [activeImg, setActiveImg] = useState(0)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const lastFocused = useRef<HTMLElement | null>(null)
   const closeBtnRef = useRef<HTMLButtonElement | null>(null)
 
@@ -67,9 +68,13 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
         // tween for an always-on ambient effect, and it respects
         // prefers-reduced-motion via a plain media query.
 
+        // Scroll-jacked pinned gallery only on larger screens — on phones
+        // this pattern fights with native scroll and feels janky, so mobile
+        // gets a plain swipeable horizontal scroll instead (see overflow-x-auto
+        // in the markup below).
         const track = document.querySelector('.horiz-track') as HTMLElement | null
         const wrap = document.querySelector('.pin-wrap') as HTMLElement | null
-        if (track && wrap) {
+        if (track && wrap && window.innerWidth >= 768) {
           let scrollAmount = track.scrollWidth - window.innerWidth + 64
           if (scrollAmount < 0) scrollAmount = 0
           gsap.to(track, {
@@ -91,7 +96,7 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
     <>
       <div className="grain" />
 
-      <header className="fixed top-0 left-0 w-full z-40 flex justify-center px-4 mt-4 md:mt-6">
+      <header className="fixed top-0 left-0 w-full z-40 flex flex-col items-center px-4 mt-4 md:mt-6">
         <nav className="glass-nav w-full max-w-5xl rounded-full flex items-center justify-between px-4 md:px-6 py-3 shadow-[0_8px_30px_rgba(36,26,21,0.08)] border border-black/5">
           <a href="#top" className="font-display text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2">
             <span className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: 'var(--terracotta)', color: 'var(--cream)' }}>D</span>
@@ -103,11 +108,33 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
             <a href="#why" className="hover:opacity-60 transition">Why Dave&rsquo;s</a>
             <a href="#reviews" className="hover:opacity-60 transition">Reviews</a>
           </div>
-          <a href="#contact" className="btn group flex items-center gap-2 rounded-full pl-4 pr-1.5 py-1.5 text-sm font-bold" style={{ background: 'var(--ink)', color: 'var(--cream)' }}>
-            Contact agent
-            <span className="btn-icon w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'var(--sand)', color: 'var(--ink)' }}>&#8599;</span>
-          </a>
+          <div className="flex items-center gap-2">
+            <a href="#contact" className="btn group hidden sm:flex items-center gap-2 rounded-full pl-4 pr-1.5 py-1.5 text-sm font-bold" style={{ background: 'var(--ink)', color: 'var(--cream)' }}>
+              Contact agent
+              <span className="btn-icon w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'var(--sand)', color: 'var(--ink)' }}>&#8599;</span>
+            </a>
+            <button
+              onClick={() => setMobileMenuOpen((v) => !v)}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen}
+              className="md:hidden w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+              style={{ background: 'var(--ink)', color: 'var(--cream)' }}
+            >
+              {mobileMenuOpen ? '\u2715' : '\u2630'}
+            </button>
+          </div>
         </nav>
+        {mobileMenuOpen && (
+          <div className="md:hidden w-full max-w-5xl mt-2 rounded-[1.5rem] overflow-hidden glass-nav border border-black/5 shadow-[0_8px_30px_rgba(36,26,21,0.08)]">
+            <div className="flex flex-col p-2 text-sm font-semibold">
+              <a href="#explore" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-black/5">House types</a>
+              <a href="#stays" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-black/5">Listings</a>
+              <a href="#why" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-black/5">Why Dave&rsquo;s</a>
+              <a href="#reviews" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-black/5">Reviews</a>
+              <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl font-bold" style={{ background: 'var(--ink)', color: 'var(--cream)' }}>Contact agent</a>
+            </div>
+          </div>
+        )}
       </header>
 
       <section id="top" className="relative min-h-[100dvh] flex flex-col justify-center pt-32 pb-16 px-4 md:px-8 overflow-hidden" style={{ background: 'var(--ink)' }}>
@@ -191,13 +218,13 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
       </section>
 
       <section id="stays" className="relative" style={{ background: 'var(--ink)' }}>
-        <div className="pin-wrap relative h-[100dvh] overflow-hidden flex flex-col justify-center">
+        <div className="pin-wrap relative py-16 md:py-0 md:h-[100dvh] md:overflow-hidden flex flex-col justify-center">
           <div className="px-4 md:px-8 mb-8 md:mb-10 shrink-0">
             <span className="inline-block rounded-full px-3 py-1 text-[10px] uppercase tracking-widest font-bold mb-3" style={{ background: 'var(--teal)', color: 'var(--cream)' }}>Featured houses</span>
             <h2 className="font-display font-extrabold" style={{ color: 'var(--cream)', fontSize: 'clamp(1.8rem,3.6vw,3rem)' }}>Live in Port Harcourt right now</h2>
           </div>
 
-          <div className="horiz-track flex gap-5 px-4 md:px-8 will-change-transform">
+          <div className="horiz-track flex gap-5 px-4 md:px-8 will-change-transform overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none no-scrollbar">
             {listings.map((listing) => (
               <div
                 key={listing.id}
@@ -205,7 +232,7 @@ export default function HomeClient({ listings }: { listings: Listing[] }) {
                 tabIndex={0}
                 role="button"
                 aria-label={`View ${listing.title}, ${listing.neighbourhood}`}
-                className="listing-card btn group shrink-0 w-[78vw] md:w-[26vw] rounded-[2rem] overflow-hidden relative cursor-pointer"
+                className="listing-card btn group shrink-0 w-[78vw] md:w-[26vw] rounded-[2rem] overflow-hidden relative cursor-pointer snap-start"
                 style={{ height: '56vh' }}
               >
                 <Image src={listing.images[0]} fill sizes="(max-width: 768px) 78vw, 26vw" className="object-cover transition-transform duration-700 group-hover:scale-105" alt={listing.title} />
